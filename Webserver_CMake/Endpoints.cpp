@@ -19,6 +19,7 @@ void ResolveGetRequest(HttpRequest* request)
 	}
 
 	HttpResponse* response;
+		if (request->AcceptedEncodings->at(i) == ENCODING_TYPE::GZIP)
 
 	switch(resourceKey)
 	{
