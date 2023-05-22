@@ -1,6 +1,7 @@
 #include "HttpRequest.h"
 #include "HttpResponse.h"
 #include "Endpoints.h"
+#include "Definitions.h"
 #include <iostream>
 
 using namespace std;
@@ -10,7 +11,7 @@ void HttpRequest::BuildFromBuffer(char* buffer, int bufferLen)
     vector<string> lines = vector<string>();
 
     const char* prevBufPos = buffer;
-    const char* currBufPos = strchr(buffer, CRLF) - 1;
+    const char* currBufPos = strchr(buffer, CRLF);
     const char* httpBodyPos = nullptr;
 
     string_view str = string_view(buffer);
@@ -31,7 +32,7 @@ void HttpRequest::BuildFromBuffer(char* buffer, int bufferLen)
 
         currBufPos += CRLF_LEN; //\r\n
         prevBufPos = currBufPos;
-        currBufPos = strchr(currBufPos, CRLF) - 1;
+        currBufPos = strchr(currBufPos, CRLF);
     }
 
     if (lines.size() == 0)
@@ -71,6 +72,24 @@ void HttpRequest::BuildFromBuffer(char* buffer, int bufferLen)
             string value = line.substr(delimiterIndex);
 
             Headers->insert({ key, value });
+        }
+    }
+
+    if (Headers->count("Accepted-Encoding") == 1) 
+    {
+        //TEMP: only accept deflate encoding for now
+        if(Headers->at("Accepted-Encoding").find(ENCODING_STRINGS.at(ENCODING_TYPE::Deflate)) != string::npos)
+        {
+            AcceptedEncodings->push_back(ENCODING_TYPE::Deflate);
+        }
+    }
+
+    if (Headers->count("Content-Encoding") == 1)
+    {
+        //TEMP: only accept deflate encoding for now
+        if (Headers->at("Content-Encoding").find(ENCODING_STRINGS.at(ENCODING_TYPE::Deflate)) != string::npos)
+        {
+            PacketEncoding = ENCODING_TYPE::Deflate;
         }
     }
 

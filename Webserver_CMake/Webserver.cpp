@@ -1,5 +1,7 @@
-#include <iostream>
 #include "HttpRequest.h"
+#include "CompressionHandler.h"
+
+#include <iostream>
 #include <thread>
 #include <string_view>
 #include <fstream>
@@ -62,6 +64,7 @@ int main()
 
     envFile.close();
 
+    CompressionHandler::Initialize();
 
     //start listening on the provided port
     SOCKET mainSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);

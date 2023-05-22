@@ -38,5 +38,6 @@
 #define CRLF '\r\n'
 #define CRLF_STR "\r\n"
 
-
 #define SEND_BLOCK_SIZE 4096
+
+#define COMPRESS_CHUNK_SIZE 16384

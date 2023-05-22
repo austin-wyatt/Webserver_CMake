@@ -18,26 +18,29 @@ void ResolveGetRequest(HttpRequest* request)
 		resourceKey = resourceEntry->second;
 	}
 
-	HttpResponse* response;
-		if (request->AcceptedEncodings->at(i) == ENCODING_TYPE::GZIP)
+	HttpResponse* response = new HttpResponse();
+
+	for (int i = 0; i < request->AcceptedEncodings->size(); i++) 
+	{
+		if (request->AcceptedEncodings->at(i) == ENCODING_TYPE::Deflate)
+		{
+			response->PacketEncoding = ENCODING_TYPE::Deflate;
+			break;
+		}
+	}
+	
 
 	switch(resourceKey)
 	{
 		case 0:
 			//return index.html
-			response = new HttpResponse();
-
 			response->SendFile("Resources/index.html", request);
-
-			delete response;
 			break;
 		case -1:
 			//generic file request
-			response = new HttpResponse();
-
 			response->SendFile("Resources" + request->Resource, request);
-			
-			delete response;
 			break;
 	}
+
+	delete response;
 }
