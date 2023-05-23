@@ -1,7 +1,10 @@
 #pragma once
 
 #include "HttpRequest.h"
+#include "CompressionHandler.h"
+#include "Definitions.h"
 #include <sstream>
+
 
 using namespace std;
 
@@ -23,8 +26,8 @@ public:
 
 	void SendFile(string path, HttpRequest* request);
 private:
-	void HandleBasicFileTransfer(ifstream* file, uintmax_t fileSize, HttpRequest* request, string path);
-	void HandleChunkedFileTransfer(ifstream* file, uintmax_t fileSize, HttpRequest* request, string path, bool shouldCompress);
+	void HandleBasicFileTransfer(FILE* file, uintmax_t fileSize, HttpRequest* request, string path);
+	void HandleChunkedFileTransfer(FILE* file, uintmax_t fileSize, HttpRequest* request, string path, bool shouldCompress);
 
 	stringstream responseStream = stringstream();
 };

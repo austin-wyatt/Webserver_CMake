@@ -6,7 +6,7 @@
 
 add_executable (EasyWebserver "Definitions.h" "Endpoints.cpp" "Endpoints.h" 
 	"HttpRequest.cpp" "HttpRequest.h" "HttpResponse.cpp" "HttpResponse.h" "public.h" 
-	"Webserver.cpp"  "CompressionHandler.h")
+	"Webserver.cpp"  "CompressionHandler.h" "TLSHandling/TLSDefinitions.h")
 
 configure_file(".env" "${CMAKE_BINARY_DIR}/bin/.env" COPYONLY) 
 

@@ -6,6 +6,9 @@
 #include <string_view>
 #include <fstream>
 
+
+#include "TLSHandling/TLSDefinitions.h"
+
 using namespace std;
 
 void HandleConnection(SOCKET socket);
@@ -130,6 +133,25 @@ void HandleConnection(SOCKET socket)
             cout << "READ BUFFER" << endl;
             cout << "|||||||||||||||||||||||||" << endl;
             cout << readBuffer << endl;
+
+            
+
+            if(*readBuffer == TLS::ContentType::handshake)
+            {
+                cout << "TLS output" << endl;
+
+                for (int i = 0; *(readBuffer + i) != '\0'; i++)
+                {
+                    cout << (short)*(readBuffer + i) << " ";
+                }
+
+                TLS::TLSPlaintext* req = new TLS::TLSPlaintext(readBuffer);
+
+                cout << endl << "TLS output" << endl << endl;
+
+                //create TLS request here
+            }
+            
 
             HttpRequest* request = new HttpRequest();
 

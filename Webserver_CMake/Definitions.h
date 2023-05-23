@@ -1,10 +1,6 @@
 #pragma once
 
-#ifdef _WIN32
 #include <string>
-#else
-#include <string.h>
-#endif
 
 #include <unordered_map>
 #include <map>

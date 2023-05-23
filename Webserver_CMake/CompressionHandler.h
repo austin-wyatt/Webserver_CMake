@@ -1,3 +1,5 @@
+#pragma once
+
 #include <zlib.h>
 #include <vector>
 #include <stdexcept>
@@ -6,10 +8,10 @@
 
 using namespace std;
 
-static class CompressionHandler 
+class CompressionHandler 
 {
 public:
-	static void Initialize()
+	static inline void Initialize()
 	{
 		if (_initialized) 
 			return;
@@ -23,21 +25,13 @@ public:
 
 			int ret;
 			z_stream* strm = new z_stream();
-			/* allocate deflate state */
-			strm->zalloc = Z_NULL;
-			strm->zfree = Z_NULL;
-			strm->opaque = Z_NULL;
-			ret = deflateInit(strm, Z_DEFAULT_COMPRESSION);
-			if (ret != Z_OK)
-			{
-				throw runtime_error("unable to allocate memory for zlib compression stream");
-			}
-			else
-				_deflateInstances.push_back(strm);
+			
+			InitDeflateInstance(strm);
+			_deflateInstances.push_back(strm);
 		}
 	}
 
-	~CompressionHandler() 
+	inline ~CompressionHandler() 
 	{
 		while(_deflateInstances.size() > 0)
 		{
@@ -56,7 +50,7 @@ public:
 		}
 	}
 
-	bool GetDeflateInstance(z_stream* stream, unsigned char* in, unsigned char* out)
+	static inline bool GetDeflateInstance(z_stream* &stream, unsigned char* &in, unsigned char* &out)
 	{
 		bool success = false;
 		_deflateInstanceLock.lock();
@@ -79,10 +73,11 @@ public:
 		return success;
 	};
 
-	void ReturnDeflateInstance(z_stream* stream, unsigned char* in, unsigned char* out) 
+	static inline void ReturnDeflateInstance(z_stream* stream, unsigned char* in, unsigned char* out) 
 	{
 		_deflateInstanceLock.lock();
 
+		InitDeflateInstance(stream);
 		_deflateInstances.push_back(stream);
 		_dataChunks.push_back(in);
 		_dataChunks.push_back(out);
@@ -91,15 +86,24 @@ public:
 	}
 
 private:
-	static const int DEFLATE_INSTANCES = 10;
-	static bool _initialized;
-	static vector<z_stream*> _deflateInstances;
-	static vector<unsigned char*> _dataChunks;
+	static inline const int DEFLATE_INSTANCES = 10;
+	static inline bool _initialized;
+	static inline vector<z_stream*> _deflateInstances;
+	static inline vector<unsigned char*> _dataChunks;
 	
-	static mutex _deflateInstanceLock;
-};
+	static inline mutex _deflateInstanceLock;
 
-//Initialize static variables
-bool CompressionHandler::_initialized = false;
-vector<z_stream*> CompressionHandler::_deflateInstances = vector<z_stream*>();
-vector<unsigned char*> CompressionHandler::_dataChunks = vector<unsigned char*>();
+	static inline void InitDeflateInstance(z_stream* strm) 
+	{
+		int ret;
+		/* allocate deflate state */
+		strm->zalloc = Z_NULL;
+		strm->zfree = Z_NULL;
+		strm->opaque = Z_NULL;
+		ret = deflateInit(strm, Z_DEFAULT_COMPRESSION);
+		if (ret != Z_OK)
+		{
+			throw runtime_error("unable to allocate memory for zlib compression stream");
+		}
+	}
+};
